@@ -14,56 +14,56 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import ru.tsarev.library_project.dao.BookDAO;
-import ru.tsarev.library_project.dao.PersonDAO;
 import ru.tsarev.library_project.model.Person;
+import ru.tsarev.library_project.services.PeopleService;
+import ru.tsarev.library_project.util.PersonValidator;
 
 @Controller
 @RequestMapping("/people")
-public class PersonController {
+public class PeopleController {
 
-	private final PersonDAO personDAO;
-	private final BookDAO bookDAO;
+	private final PeopleService peopleService;
+	private final PersonValidator personValidator;
 
 	@Autowired
-	public PersonController(PersonDAO personDAO, BookDAO bookDAO) {
-		this.personDAO = personDAO;
-		this.bookDAO = bookDAO;
+	public PeopleController(PeopleService peopleService, PersonValidator personValidator) {
+		this.peopleService = peopleService;
+		this.personValidator = personValidator;
 	}
 
-	// список всех пользователей
 	@GetMapping()
 	public String index(Model model) {
-		model.addAttribute("people", personDAO.index());
+		model.addAttribute("people", peopleService.findAll());
 		return "people/index";
 	}
 
-	// конкретный человек
 	@GetMapping("/{id}")
 	public String show(@PathVariable("id") int id, Model model) {
-		model.addAttribute("person", personDAO.show(id));
-		model.addAttribute("books", bookDAO.getBooksOfPerson(id));
+		model.addAttribute("person", peopleService.findOne(id));
+		model.addAttribute("books", peopleService.getBooksByPersonId(id));
+
 		return "people/show";
 	}
 
-	// сохрание нового пользователя
 	@GetMapping("/new")
-	public String saveNewPerson(@ModelAttribute("person") Person person) {
+	public String newPerson(@ModelAttribute("person") Person person) {
 		return "people/new";
 	}
 
 	@PostMapping()
 	public String create(@ModelAttribute("person") @Valid Person person, BindingResult bindingResult) {
+		personValidator.validate(person, bindingResult);
+
 		if (bindingResult.hasErrors())
 			return "people/new";
-		personDAO.save(person);
+
+		peopleService.save(person);
 		return "redirect:/people";
 	}
 
-	// изменение данных человека
 	@GetMapping("/{id}/edit")
 	public String edit(Model model, @PathVariable("id") int id) {
-		model.addAttribute("person", personDAO.show(id));
+		model.addAttribute("person", peopleService.findOne(id));
 		return "people/edit";
 	}
 
@@ -72,15 +72,14 @@ public class PersonController {
 			@PathVariable("id") int id) {
 		if (bindingResult.hasErrors())
 			return "people/edit";
-		personDAO.update(id, person);
+
+		peopleService.update(id, person);
 		return "redirect:/people";
 	}
 
-	// удаление данных о человеке
 	@DeleteMapping("/{id}")
 	public String delete(@PathVariable("id") int id) {
-		personDAO.delete(id);
+		peopleService.delete(id);
 		return "redirect:/people";
 	}
-
 }

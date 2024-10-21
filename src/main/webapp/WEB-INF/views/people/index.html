@@ -1,24 +1,20 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Список пользователей</title>
+    <meta charset="UTF-8">
+    <title>Index</title>
 </head>
 <body>
 
-	<div th:each="person : ${people}">
-		<a th:href="@{/people/{id} (id=${person.getPersonId()})}"
-			th:text="${person.getPersonId() + ', ' + person.getName() + ', ' + person.getYearOfBirth()}">user</a>
-	</div>
+<div th:each="person : ${people}">
+    <a th:href="@{/people/{id}(id=${person.getId()})}"
+       th:text="${person.getFullName() + ', ' + person.getYearOfBirth()}">user</a>
+</div>
 
-	<br>
-	<hr>
+<br/>
+<hr/>
 
-	<a href="/people/new">Создать нового пользователя</a>
-
-	<br>
-	<hr>
-	<a href="/books">Список книг</a>
+<a href="/people/new">Добавить человека</a>
 
 </body>
 </html>

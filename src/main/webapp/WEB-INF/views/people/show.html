@@ -1,40 +1,42 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Пользователь</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Show</title>
 </head>
 <body>
+<p th:text="${person.getFullName() + ', ' + person.getYearOfBirth()}">VALUE</p>
 
-	<h2 th:text="${person.getName() + ', ' + person.getYearOfBirth()}">value</h2>
+<div th:if="${books.isEmpty()}">
+    <p>Человек пока не взял ни одной книги</p>
+    <hr/>
+</div>
 
-	<br>
-	<hr>
+<div th:if="${!books.isEmpty()}">
+    <hr/>
+    <b>Книги:</b>
+    <br/>
+    <table th:each="book : ${books}">
+        <tr>
+            <td>
+                <span th:text="${book.getTitle() + ', ' + book.getAuthor() + ', ' + book.getYear()}"
+                   th:style="${book.isExpired()} ? 'color: red' : 'color: black'">
+                    book
+                </span>
+            </td>
+        </tr>
+    </table>
+    <hr/>
+</div>
 
-	<h4 th:if="${books.isEmpty()}">Человек пока не взял ни одной книги</h4>
-	<div th:unless="${books.isEmpty()}">
-		<h3>Книги:</h3>
-		<div th:each="book : ${books}">
-			<h4
-				th:text="${book.getTitle() + ', ' + book.getAuthor() + ', ' + book.getYearOfWriting()}"></h4>
-		</div>
-	</div>
+<form th:method="GET" th:action="@{/people/{id}/edit(id=${person.getId()})}">
+    <input type="submit" value="Редактировать"/>
+</form>
 
-	<br>
-	<hr>
-
-	<a th:href="@{/people/{id}/edit (id=${person.getPersonId()})}">Редактировать</a>
-
-	<form th:method="DELETE"
-		th:action="@{/people/{id} (id=${person.getPersonId()})}">
-		<input type="submit" value="Удалить" />
-	</form>
-
-	<br>
-	<hr>
-	<a href="/people">Список пользователей</a>
-	<br>
-	<a href="/books">Список книг</a>
+<form th:method="DELETE" th:action="@{/people/{id}(id=${person.getId()})}">
+    <input type="submit" value="Удалить"/>
+</form>
 
 </body>
 </html>
